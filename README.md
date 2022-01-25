@@ -1,7 +1,7 @@
 # Requirements
 
-*   Blender 3.1.0 alpha ([https://developer.blender.org/D13446](2021-12-15 or
-    later))
+*   Blender 3.1.0 alpha ([2021-12-15 or
+    later](https://developer.blender.org/D13446))
 
 *   imagemagick or graphicsmagick (to provide the `identify` CLI tool, used to find bounding box from a matte)
 
