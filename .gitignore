@@ -1,0 +1,6 @@
+.DS_Store
+.idea
+*.log
+tmp/
+renders/
+*.blend1
