@@ -37,24 +37,30 @@ COLORS = "WRGBOY"
 y_of_sticker = [int(c) for c in "111101111000000000202101202000000000202101202111101111"]
 x_of_sticker = [x_of_sticker(i) for i in range(54)]
 
-def render_clip():
-    c = [random.choice(COLORS) for sticker in range(54)]
+def render_clip(clip_id):
+    colours = [random.choice(COLORS) for sticker in range(54)]
+    #colours = ["R" if sticker+1 == 19 else "W" for sticker in range(54)]
     # update sticker texture
+
+    image = bpy.data.images.new("clip{}".format(clip_id), 27, 3)
     for sticker in range(54):
         x, y = x_of_sticker[sticker], y_of_sticker[sticker]
-        color = COLOR_MAP[c[sticker]]
+        color = COLOR_MAP[colours[sticker]]
         off = y*4*27 + x*4
         for i in range(3):
-            bpy.data.images['Texture'].pixels[off + i] = color[i]
-        bpy.data.images['Texture'].pixels[off + 3] = 1.
+            image.pixels[off + i] = color[i]
+        image.pixels[off + 3] = 1.
+    image.update()
+
+    bpy.data.node_groups["NodeGroup.001"].nodes["Image Texture"].image = image
+    bpy.data.node_groups["NodeGroup.001"].nodes["Image Texture"].update()
 
     cube = bpy.data.objects['Cube']
 
     cube.data.update()
     bpy.context.view_layer.update()
-    
+
     # update cube properties
-    cube = bpy.data.objects['Cube']
     mod = cube.modifiers['GeometryNodes']
     mod['Input_3'][0] = 0.
     mod['Input_3'][1] = 0.
@@ -70,7 +76,7 @@ def render_clip():
     mod['Input_7'] = stickers
     
     endtime = int(random.triangular(3,10,6))
-    
+
     # update lights
     bpy.data.objects['Point1'].location[0] = random.triangular(-3., 3.)
     bpy.data.objects['Point1'].location[1] = random.triangular(-3., 3.)
@@ -171,7 +177,7 @@ def render_clip():
     bpy.ops.render.render(animation=True)
     
     with open(renderpath + "{:04d}-{:04d}.mkv.cube-labels.json".format(1, endtime), "w") as f:
-        j = {'permutations': [[i+1 for i in range(54)]], 'colours': [c], 'events': [{'time': -1, 'moves': [], 'permutation_id': 1, 'colours_id': 1}]}
+        j = {'permutations': [[i+1 for i in range(54)]], 'colours': [colours], 'events': [{'time': -1, 'moves': [], 'permutation_id': 1, 'colours_id': 1}]}
         f.write(json.dumps(j))
 
     ire = re.compile(r"^(\d+)x(\d+)\+(\d+)\+(\d+)$")
@@ -194,4 +200,4 @@ if __name__ == "__main__":
     for i in range(n):
         print("Clip {}".format(i))
         sys.stdout.flush()
-        render_clip()
+        render_clip(i)
